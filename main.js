@@ -117,3 +117,73 @@ overlay.addEventListener('click', () => {
   sidebar.classList.remove('open');
   overlay.classList.remove('open');
 });
+
+// Certificate Lightbox Modal Logic
+const certCards = document.querySelectorAll('.cert-card');
+const certModal = document.getElementById('cert-modal');
+const certModalImg = document.getElementById('cert-modal-img');
+const certModalTitle = document.getElementById('cert-modal-title');
+const certModalClose = document.getElementById('cert-modal-close');
+const certModalBackdrop = document.getElementById('cert-modal-backdrop');
+
+function openCertModal(card) {
+  const imgSrc = card.getAttribute('data-img');
+  const title = card.getAttribute('data-title');
+  
+  if (imgSrc) {
+    certModalImg.src = imgSrc;
+    certModalTitle.textContent = title || 'Certificate';
+    certModal.classList.add('open');
+    document.body.style.overflow = 'hidden'; // Prevents background scroll
+  }
+}
+
+function closeCertModal() {
+  certModal.classList.remove('open');
+  document.body.style.overflow = ''; // Restore background scroll
+  // Delay clearing image to allow close transition to finish
+  setTimeout(() => {
+    certModalImg.src = '';
+    certModalTitle.textContent = '';
+  }, 250);
+}
+
+certCards.forEach(card => {
+  card.addEventListener('click', () => openCertModal(card));
+});
+
+certModalClose.addEventListener('click', closeCertModal);
+certModalBackdrop.addEventListener('click', closeCertModal);
+
+// Close modal on escape key press
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && certModal.classList.contains('open')) {
+    closeCertModal();
+  }
+});
+
+// ── 3D TILT EFFECT FOR CARDS ──
+const tiltCards = document.querySelectorAll('.timeline-item, .project-card, .edu-card, .cert-card');
+
+tiltCards.forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const xc = rect.width / 2;
+    const yc = rect.height / 2;
+    
+    // Calculate tilt angle (max 10 degrees rotation)
+    const angleX = (yc - y) / yc * 10; 
+    const angleY = (x - xc) / xc * 10;
+    
+    card.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) scale3d(1.02, 1.02, 1.02)`;
+  });
+  
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+  });
+});
+
+
